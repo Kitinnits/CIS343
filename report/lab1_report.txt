@@ -1,0 +1,81 @@
+-------------------------
+Lab 1 Report
+-------------------------
+
+My language is called "language" because it doesn't require a 
+complex name to function. 
+
+--------------
+Regex
+--------------
+
+Number literals - [0-9]+ (\.[0-9]+)?
+String literals - "[^"]*"
+Identifiers - [a-zA-Z_0-9]+
+
+---------------
+Design Choices
+---------------
+
+I followed most of the design choices that lox followed,
+but I changed the keywords fun and nil to def and none
+respectively because I am more familiar with them.
+
+---------------
+Setup Instructions
+---------------
+
+The language is self-contained and does not require any dependencies.
+
+To run the program in repl mode, run "python src/language.py".
+to read a file using the program, run "python src/language.py <filepath>
+to run the test file, run "python src/language.py test/lab1/lab1_test.txt"
+
+----------------
+Test results
+----------------
+
+The test file tests every token type, and every error that the scanner can handle.
+The output outputs the errors of unrecognized characters at line 23 and unterminated string at line 27.
+The numeric boundary case test within the test file shows that the "." character is treated as an operator
+in these cases.
+
+----------------
+Test output
+----------------
+
+1 arguments provided: ['test/lab1/lab1_test.txt']
+// Keywords
+and class else false for def if none or print return super this true var while
+
+// Identifiers and numeric literals
+_ name name2 _2 mixed_Name_123
+0 7 00042 3.14 0.5 10.0
+
+// Strings, including an empty string and a string spanning lines
+"hello, world" ""
+"line one
+line two"
+
+// Every supported operator
+( ) { } [ ] , . ; + - * / % = == ! != < <= > >= && ||
+
+// Adjacent tokens, comments, whitespace, and line tracking
+var(x)=1;print(x) // the rest of this line is ignored
+
+// Numeric boundary cases: dot requires digits on both sides for decimals
+1. .5 2.3.4
+
+// Unrecognized characters are reported and skipped
+a & b | c @ d
+
+// Unterminated strings are reported and do not emit a literal; keep this last
+"unfinished
+
+Unrecognized character '&' at line 23
+Unrecognized character '|' at line 23
+Unrecognized character '@' at line 23
+Unterminated string at line 27
+[Token(type=TokenType.KEYWORD, value=and, lexeme=and, line=2), Token(type=TokenType.KEYWORD, value=class, lexeme=class, line=2), Token(type=TokenType.KEYWORD, value=else, lexeme=else, line=2), Token(type=TokenType.KEYWORD, value=false, lexeme=false, line=2), Token(type=TokenType.KEYWORD, value=for, lexeme=for, line=2), Token(type=TokenType.KEYWORD, value=def, lexeme=def, line=2), Token(type=TokenType.KEYWORD, value=if, lexeme=if, line=2), Token(type=TokenType.KEYWORD, value=none, lexeme=none, line=2), Token(type=TokenType.KEYWORD, value=or, lexeme=or, line=2), Token(type=TokenType.KEYWORD, value=print, lexeme=print, line=2), Token(type=TokenType.KEYWORD, value=return, lexeme=return, line=2), Token(type=TokenType.KEYWORD, value=super, lexeme=super, line=2), Token(type=TokenType.KEYWORD, value=this, lexeme=this, line=2), Token(type=TokenType.KEYWORD, value=true, lexeme=true, line=2), Token(type=TokenType.KEYWORD, value=var, lexeme=var, line=2), Token(type=TokenType.KEYWORD, value=while, lexeme=while, line=2), Token(type=TokenType.IDENTIFIER, value=_, lexeme=_, line=5), Token(type=TokenType.IDENTIFIER, value=name, lexeme=name, line=5), Token(type=TokenType.IDENTIFIER, value=name2, lexeme=name2, line=5), Token(type=TokenType.IDENTIFIER, value=_2, lexeme=_2, line=5), Token(type=TokenType.IDENTIFIER, value=mixed_Name_123, lexeme=mixed_Name_123, line=5), Token(type=TokenType.LITERAL, value=0, lexeme=0, line=6), Token(type=TokenType.LITERAL, value=7, lexeme=7, line=6), Token(type=TokenType.LITERAL, value=42, lexeme=00042, line=6), Token(type=TokenType.LITERAL, value=3.14, lexeme=3.14, line=6), Token(type=TokenType.LITERAL, value=0.5, lexeme=0.5, line=6), Token(type=TokenType.LITERAL, value=10.0, lexeme=10.0, line=6), Token(type=TokenType.LITERAL, value=hello, world, lexeme="hello, world", line=9), Token(type=TokenType.LITERAL, value=, lexeme="", line=9), Token(type=TokenType.LITERAL, value=line one
+line two, lexeme="line one
+line two", line=11), Token(type=TokenType.OPERATOR, value=(, lexeme=(, line=14), Token(type=TokenType.OPERATOR, value=), lexeme=), line=14), Token(type=TokenType.OPERATOR, value={, lexeme={, line=14), Token(type=TokenType.OPERATOR, value=}, lexeme=}, line=14), Token(type=TokenType.OPERATOR, value=[, lexeme=[, line=14), Token(type=TokenType.OPERATOR, value=], lexeme=], line=14), Token(type=TokenType.OPERATOR, value=,, lexeme=,, line=14), Token(type=TokenType.OPERATOR, value=., lexeme=., line=14), Token(type=TokenType.OPERATOR, value=;, lexeme=;, line=14), Token(type=TokenType.OPERATOR, value=+, lexeme=+, line=14), Token(type=TokenType.OPERATOR, value=-, lexeme=-, line=14), Token(type=TokenType.OPERATOR, value=*, lexeme=*, line=14), Token(type=TokenType.OPERATOR, value=/, lexeme=/, line=14), Token(type=TokenType.OPERATOR, value=%, lexeme=%, line=14), Token(type=TokenType.OPERATOR, value==, lexeme==, line=14), Token(type=TokenType.OPERATOR, value===, lexeme===, line=14), Token(type=TokenType.OPERATOR, value=!, lexeme=!, line=14), Token(type=TokenType.OPERATOR, value=!=, lexeme=!=, line=14), Token(type=TokenType.OPERATOR, value=<, lexeme=<, line=14), Token(type=TokenType.OPERATOR, value=<=, lexeme=<=, line=14), Token(type=TokenType.OPERATOR, value=>, lexeme=>, line=14), Token(type=TokenType.OPERATOR, value=>=, lexeme=>=, line=14), Token(type=TokenType.OPERATOR, value=&&, lexeme=&&, line=14), Token(type=TokenType.OPERATOR, value=||, lexeme=||, line=14), Token(type=TokenType.KEYWORD, value=var, lexeme=var, line=17), Token(type=TokenType.OPERATOR, value=(, lexeme=(, line=17), Token(type=TokenType.IDENTIFIER, value=x, lexeme=x, line=17), Token(type=TokenType.OPERATOR, value=), lexeme=), line=17), Token(type=TokenType.OPERATOR, value==, lexeme==, line=17), Token(type=TokenType.LITERAL, value=1, lexeme=1, line=17), Token(type=TokenType.OPERATOR, value=;, lexeme=;, line=17), Token(type=TokenType.KEYWORD, value=print, lexeme=print, line=17), Token(type=TokenType.OPERATOR, value=(, lexeme=(, line=17), Token(type=TokenType.IDENTIFIER, value=x, lexeme=x, line=17), Token(type=TokenType.OPERATOR, value=), lexeme=), line=17), Token(type=TokenType.LITERAL, value=1, lexeme=1, line=20), Token(type=TokenType.OPERATOR, value=., lexeme=., line=20), Token(type=TokenType.OPERATOR, value=., lexeme=., line=20), Token(type=TokenType.LITERAL, value=5, lexeme=5, line=20), Token(type=TokenType.LITERAL, value=2.3, lexeme=2.3, line=20), Token(type=TokenType.OPERATOR, value=., lexeme=., line=20), Token(type=TokenType.LITERAL, value=4, lexeme=4, line=20), Token(type=TokenType.IDENTIFIER, value=a, lexeme=a, line=23), Token(type=TokenType.IDENTIFIER, value=b, lexeme=b, line=23), Token(type=TokenType.IDENTIFIER, value=c, lexeme=c, line=23), Token(type=TokenType.IDENTIFIER, value=d, lexeme=d, line=23), Token(type=TokenType.EOF, value=None, lexeme=, line=27)]

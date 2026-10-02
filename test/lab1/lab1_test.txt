@@ -1,0 +1,26 @@
+// Keywords
+and class else false for def if none or print return super this true var while
+
+// Identifiers and numeric literals
+_ name name2 _2 mixed_Name_123
+0 7 00042 3.14 0.5 10.0
+
+// Strings, including an empty string and a string spanning lines
+"hello, world" ""
+"line one
+line two"
+
+// Every supported operator
+( ) { } [ ] , . ; + - * / % = == ! != < <= > >= && ||
+
+// Adjacent tokens, comments, whitespace, and line tracking
+var(x)=1;print(x) // the rest of this line is ignored
+
+// Numeric boundary cases: dot requires digits on both sides for decimals
+1. .5 2.3.4
+
+// Unrecognized characters are reported and skipped
+a & b | c @ d
+
+// Unterminated strings are reported and do not emit a literal; keep this last
+"unfinished
