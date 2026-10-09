@@ -1,0 +1,114 @@
+--------------------
+Lab 2 Report
+--------------------
+
+----------
+Grammar
+----------
+
+The expression parser uses recursive descent and follows the precedence
+hierarchy below. Each level parses the next higher-precedence level first, so
+operators bind in the expected order:
+
+expression  -> equality
+equality    -> comparison (("!=" | "==") comparison)*
+comparison  -> term ((">" | ">=" | "<" | "<=") term)*
+term        -> factor (("-" | "+") factor)*
+factor      -> unary (("/" | "*" | "%") unary)*
+unary       -> ("!" | "-") unary | primary
+primary     -> literal | "(" expression ")"
+
+The grammar creates an abstract syntax tree using four expression node types:
+`Literal`, `Unary`, `Binary`, and `Grouping`. The precedence levels ensure that multiplication is nested
+inside addition, and unary operators are applied before binary operators.
+
+Supported literals are numbers, strings, `true`, `false`, and `none`.
+`AstPrinter` displays the resulting tree in Lisp-style prefix notation.
+
+This grammar is based directly on the expression grammar from Lox.
+It uses the same recursive-descent structure and the
+same precedence order for equality, comparison, addition/subtraction,
+multiplication/division, unary expressions, and grouping.
+
+In contrast to Lox's implementation, Language uses 'none' in place of 'nil',
+and the modulo operator is supported 
+
+------------
+Testing
+------------
+
+The lab2_test.py file only is dependent on language.py. To reproduce the 
+tests, simply run the lab2_test file. 
+
+The lab2_test file contains three tests that cover every supported 
+literal type, operator, and nested operations.
+
+the first test case shows our arithmetic operators and number literals, The
+second case shows our comparison operators as well as our "true" "false" and "none"
+literals, and our third case shows nested expressions, as well as a combination of
+comparison operators, string and number literals, and arithmetic operators.
+
+------------
+Test cases
+------------
+
+Case 1: arithmetic
+
+arithmetic = Binary(
+    Unary(operator("-"), Literal(1)),
+    operator("*"),
+    Grouping(
+        Binary(
+            Binary(Literal(45.67), operator("+"), Literal(2)),
+            operator("/"),
+            Binary(Literal(8), operator("%"), Literal(3)),
+        )
+    ),
+)
+
+Result:
+Arithmetic Expression:
+(* (- 1) (group (/ (+ 45.67 2) (% 8 3))))
+
+
+Case 2: comparison
+
+comparisons = Binary(
+    Binary(
+        Binary(Literal(True), operator("=="), Literal(False)),
+        operator("!="),
+        Literal(None),
+    ),
+    operator("=="),
+    Binary(
+        Binary(Literal(1), operator("<"), Literal(2)),
+        operator(">="),
+        Binary(Literal(3), operator("<="), Literal(4)),
+    ),
+)
+
+Result:
+Comparison Expression:
+(== (!= (== true false) none) (>= (< 1 2) (<= 3 4)))
+
+
+Case 3: nested
+
+nested = Unary(
+    operator("!"),
+    Grouping(
+        Binary(
+            Binary(Literal("working"), operator("=="), Literal("language")),
+            operator("!="),
+            Binary(
+                Binary(Literal(10), operator("-"), Literal(4)),
+                operator(">"),
+                Binary(Literal(2), operator("+"), Literal(3)),
+            ),
+        )
+    ),
+)
+
+Result:
+Nested Expression:
+(! (group (!= (== working language) (> (- 10 4) (+ 2 3)))))

@@ -20,6 +20,208 @@ class Token:
     def __repr__(self):
         return f"Token(type={self.type}, value={self.value}, lexeme={self.lexeme}, line={self.line})"
 
+
+class Expr:
+    pass
+
+
+class Literal(Expr):
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return f"Literal({self.value!r})"
+
+
+class Unary(Expr):
+    def __init__(self, operator, right):
+        self.operator = operator
+        self.right = right
+
+    def __repr__(self):
+        return f"Unary({self.operator.lexeme!r}, {self.right!r})"
+
+
+class Binary(Expr):
+    def __init__(self, left, operator, right):
+        self.left = left
+        self.operator = operator
+        self.right = right
+
+    def __repr__(self):
+        return (
+            f"Binary({self.left!r}, {self.operator.lexeme!r}, "
+            f"{self.right!r})"
+        )
+
+
+class Grouping(Expr):
+    def __init__(self, expression):
+        self.expression = expression
+
+    def __repr__(self):
+        return f"Grouping({self.expression!r})"
+
+
+class AstPrinter:
+
+    def print(self, expression):
+        if isinstance(expression, Binary):
+            return self.visit_binary(expression)
+        if isinstance(expression, Grouping):
+            return self.visit_grouping(expression)
+        if isinstance(expression, Literal):
+            return self.visit_literal(expression)
+        if isinstance(expression, Unary):
+            return self.visit_unary(expression)
+        raise TypeError(f"Unsupported expression type: {type(expression).__name__}")
+
+    def visit_binary(self, expression):
+        return self.parenthesize(
+            expression.operator.lexeme,
+            expression.left,
+            expression.right,
+        )
+
+    def visit_grouping(self, expression):
+        return self.parenthesize("group", expression.expression)
+
+    def visit_literal(self, expression):
+        if expression.value is None:
+            return "none"
+        if isinstance(expression.value, bool):
+            return str(expression.value).lower()
+        return str(expression.value)
+
+    def visit_unary(self, expression):
+        return self.parenthesize(expression.operator.lexeme, expression.right)
+
+    def parenthesize(self, name, *expressions):
+        parts = [f"({name}"]
+        parts.extend(f" {self.print(expression)}" for expression in expressions)
+        parts.append(")")
+        return "".join(parts)
+
+
+class ParseError(Exception):
+    pass
+
+
+class Parser:
+
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.current = 0
+
+    def parse(self):
+        expression = self.expression()
+        if not self.is_at_end():
+            raise self.error(self.peek(), "Expected end of expression.")
+        return expression
+
+    def expression(self):
+        return self.equality()
+
+    def equality(self):
+        expression = self.comparison()
+
+        while self.match_lexemes("!=", "=="):
+            operator = self.previous()
+            right = self.comparison()
+            expression = Binary(expression, operator, right)
+
+        return expression
+
+    def comparison(self):
+        expression = self.term()
+
+        while self.match_lexemes(">", ">=", "<", "<="):
+            operator = self.previous()
+            right = self.term()
+            expression = Binary(expression, operator, right)
+
+        return expression
+
+    def term(self):
+        expression = self.factor()
+
+        while self.match_lexemes("-", "+"):
+            operator = self.previous()
+            right = self.factor()
+            expression = Binary(expression, operator, right)
+
+        return expression
+
+    def factor(self):
+        expression = self.unary()
+
+        while self.match_lexemes("/", "*", "%"):
+            operator = self.previous()
+            right = self.unary()
+            expression = Binary(expression, operator, right)
+
+        return expression
+
+    def unary(self):
+        if self.match_lexemes("!", "-"):
+            operator = self.previous()
+            return Unary(operator, self.unary())
+
+        return self.primary()
+
+    def primary(self):
+        if self.match_lexemes("false"):
+            return Literal(False)
+        if self.match_lexemes("true"):
+            return Literal(True)
+        if self.match_lexemes("none"):
+            return Literal(None)
+        if self.check(TokenType.LITERAL):
+            return Literal(self.advance().value)
+        if self.match_lexemes("("):
+            expression = self.expression()
+            self.consume_lexeme(")", "Expected ')' after expression.")
+            return Grouping(expression)
+
+        raise self.error(self.peek(), "Expected expression.")
+
+    def match_lexemes(self, *lexemes):
+        for lexeme in lexemes:
+            if self.check_lexeme(lexeme):
+                self.advance()
+                return True
+        return False
+
+    def consume_lexeme(self, lexeme, message):
+        if self.check_lexeme(lexeme):
+            return self.advance()
+        raise self.error(self.peek(), message)
+
+    def check(self, token_type):
+        return not self.is_at_end() and self.peek().type == token_type
+
+    def check_lexeme(self, lexeme):
+        return not self.is_at_end() and self.peek().lexeme == lexeme
+
+    def advance(self):
+        if not self.is_at_end():
+            self.current += 1
+        return self.previous()
+
+    def is_at_end(self):
+        return self.peek().type == TokenType.EOF
+
+    def peek(self):
+        return self.tokens[self.current]
+
+    def previous(self):
+        return self.tokens[self.current - 1]
+
+    def error(self, token, message):
+        location = f" at line {token.line}" if token.line is not None else ""
+        return ParseError(f"{message}{location}")
+
+
 class Scanner:
     KEYWORDS = {
         "and", "class", "else", "false", "for", "def", "if", "none",
